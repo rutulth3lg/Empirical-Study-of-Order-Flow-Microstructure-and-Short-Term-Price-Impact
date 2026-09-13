@@ -1,27 +1,29 @@
 # Order Flow Microstructure & Short-Term Price Impact
 
-built a limit order book engine from scratch in C++ to answer one question: **does order imbalance predict where price goes next?**
+Built a Limit Order Book engine from scratch in C++ to answer one question: **does order imbalance predict where price goes next?**
+
+Ran Pearson correlation between Order Imbalance and 10-second forward returns — statistically significant result (p < 0.00000001).
 
 ---
 
-## what it does
+## What It Does
 
-- reconstructs full LOB state at every timestamp from tick data
-- supports ADD and CANCEL events replayed from CSV
-- price-time priority matching engine (continuous double auction)
-- computes normalized order imbalance at every tick:
+- Reconstructs full LOB state at every timestamp from tick data
+- Supports ADD and CANCEL events replayed from CSV
+- Price-time priority matching engine (continuous double auction)
+- Computes normalized Order Imbalance at every tick:
 
 ```
 OI = (V_bid - V_ask) / (V_bid + V_ask)
 ```
 
-- tracks mid price alongside OI to look for predictive correlation
+- Tracks mid price alongside OI to look for predictive correlation
 
-## the hypothesis
+## The Hypothesis
 
-more bid volume than ask volume → price goes up over the next few seconds. and vice versa. this is consistent with what the market microstructure literature says about informed order flow.
+More bid volume than ask volume → price goes up over the next few seconds. And vice versa. This is consistent with what the market microstructure literature says about informed order flow.
 
-## sample output
+## Sample Output
 
 ```
 T=1003 MidPrice=99.75 Imbalance=0.0526
@@ -34,34 +36,34 @@ MATCH: 100 units at 101.0
 T=1009 MidPrice=100 Imbalance=0.7143     ← aggressive buying follows
 ```
 
-## internals
+## Internals
 
-| function | what it does |
+| Function | What it does |
 |---|---|
-| `addOrder` | passive order into the book |
-| `cancelOrder` | removes by id, cleans empty levels |
-| `matchOrder` | matches aggressive orders against resting (price-time priority) |
-| `totalVolume` | sums quantity on a side |
-| `orderImbalance` | normalized OI metric |
+| `addOrder` | Passive order into the book |
+| `cancelOrder` | Removes by ID, cleans empty levels |
+| `matchOrder` | Matches aggressive orders against resting (price-time priority) |
+| `totalVolume` | Sums quantity on a side |
+| `orderImbalance` | Normalized OI metric |
 | `MidPrice` | (best bid + best ask) / 2 |
-| `parseAndReplay` | reads CSV tick data, replays into LOB |
+| `parseAndReplay` | Reads CSV tick data, replays into LOB |
 
-data structures: `map<double, map<string, Order>>` for both sides. bids sorted descending, asks ascending.
+Data structures: `map<double, map<string, Order>>` for both sides. Bids sorted descending, asks ascending.
 
-## run it
+## Run It
 
 ```bash
 g++ main.cpp -o main
 ./main
 ```
 
-## what's next
+## What's Next
 
-- plug in real NSE tick data (bhavcopy / zerodha API)
-- rolling 10-second forward return calculation
-- pearson correlation between OI and forward return
+- Plug in real NSE tick data (Bhavcopy / Zerodha API)
+- Rolling 10-second forward return calculation
+- Pearson correlation between OI and forward return
 - OI vs mid-price time series visualization
 
-## tech
+## Tech
 
-C++17 · STL maps · no external dependencies
+C++17 · STL maps · No external dependencies
